@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A Youtube Search Bar</title>
+  <style>
+    :root{
+      --bg1: #0f1724;
+      --bg2: #051027;
+      --accent: #ff0000;
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.02);
+      --text: #e6eef8;
+    }
+
+    /* Full-screen animated gradient */
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background: linear-gradient(120deg, #020617 0%, #07102a 35%, #0a1b2e 100%);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* subtle moving gradient overlay */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-20%;
+      background: radial-gradient(circle at 10% 10%, rgba(255,0,70,0.06), transparent 6%),
+                  radial-gradient(circle at 90% 90%, rgba(0,150,255,0.04), transparent 8%);
+      filter: blur(40px);
+      animation: float 12s ease-in-out infinite;
+      z-index:0;
+      pointer-events:none;
+    }
+    @keyframes float{
+      0%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-18px) rotate(3deg)}
+      100%{transform:translateY(0) rotate(0deg)}
+    }
+
+    .card{
+      position:relative;
+      z-index:1;
+      width:min(900px, 94%);
+      max-width:900px;
+      padding:36px;
+      border-radius:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+      border: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(8px) saturate(120%);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      align-items:center;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:4px;
+    }
+
+    .play{
+      width:56px;
+      height:36px;
+      background:var(--accent);
+      border-radius:8px;
+      display:inline-grid;
+      place-items:center;
+      position:relative;
+      box-shadow: 0 8px 30px rgba(255,0,0,0.12), inset 0 -4px 8px rgba(0,0,0,0.2);
+      transform:translateY(-2px);
+    }
+    .play::after{
+      content:"";
+      display:block;
+      width:0;
+      height:0;
+      border-left:14px solid white;
+      border-top:9px solid transparent;
+      border-bottom:9px solid transparent;
+      margin-left:3px;
+    }
+
+    h1{
+      font-size:20px;
+      margin:0;
+      letter-spacing:0.2px;
+      color:var(--text);
+    }
+    p.lead{
+      margin:0;
+      color:#cbd7e6;
+      opacity:0.9;
+      font-size:13px;
+    }
+
+    form{
+      width:100%;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-top:6px;
+    }
+
+    input[type="text"]{
+      -webkit-appearance:none;
+      appearance:none;
+      flex:1;
+      min-width:180px;
+      padding:14px 18px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      color:var(--text);
+      font-size:16px;
+      outline:none;
+      transition: box-shadow .18s ease, transform .12s ease, border-color .12s ease;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+    }
+    input[type="text"]::placeholder{ color: #b9c6da; opacity:0.8; }
+
+    input[type="text"]:focus{
+      border-color: rgba(255,0,0,0.9);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 0 0 6px rgba(255,0,0,0.06);
+      transform: translateY(-2px);
+    }
+
+    button[type="submit"]{
+      background: linear-gradient(180deg, #ce1a1a, #a30000);
+      color:white;
+      border:0;
+      padding:12px 18px;
+      border-radius:10px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow: 0 8px 26px rgba(163,0,0,0.24);
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    button[type="submit"]:hover{ transform: translateY(-3px); box-shadow: 0 14px 40px rgba(163,0,0,0.28); }
+    button[type="submit"]:active{ transform: translateY(-1px); opacity:0.96; }
+
+    .footer{
+      margin-top:8px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-size:13px;
+      color:#c7d6ea;
+    }
+    .github-link{
+      color:var(--text);
+      background:var(--glass);
+      padding:8px 12px;
+      border-radius:999px;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,0.03);
+      transition: transform .12s ease, background .12s ease;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+    .github-link:hover{ transform: translateY(-3px); background:rgba(255,255,255,0.045); }
+
+    @media (max-width:520px){
+      .card{ padding:18px; border-radius:12px; }
+      .play{ width:46px; height:30px; }
+      h1{ font-size:18px; }
+      form{ flex-direction:column; gap:10px; }
+      button[type="submit"]{ width:100%; justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <div class="brand" aria-hidden="false">
+      <div class="play" aria-hidden="true"></div>
+      <div>
+        <h1 id="title">YouTube Quick Search</h1>
+        <p class="lead"> This is a youtube quick search.....Type anything you want to search and press Enter or click "Search Now" you'll tehn be directed to your youtube searc</p>
+      </div>
+    </div>
+
+    <!-- Fixed param name to `search_query` so YouTube receives the query correctly -->
+    <form action="https://www.youtube.com/results" method="GET" target="_blank" aria-label="Search YouTube">
+      <input
+        type="text"
+        name="search_query"
+        placeholder="Search on YouTube — e.g. lofi beats"
+        aria-label="Search query"
+        required
+      />
+      <button type="submit" title="Search Now">Search Now</button>
+    </form>
+
+    <div class="footer" aria-label="Footer with github link">
+      <span>Made by Diddie</span>
+      <a class="github-link" href="https://github.com/Diddie029" target="_blank" rel="noopener noreferrer">
+        view my GitHub
+      </a>
+    </div>
+  </main>
+</body>
+</html>
